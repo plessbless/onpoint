@@ -1,13 +1,16 @@
 import './styles/styles.css'
 
-//slider-swiper
 const images = document.querySelectorAll('.slider .slider-line .bg.img');
 const sliderLine = document.querySelector('.slider .slider-line');
+const width = document.querySelector('.slider').offsetWidth;
+const slider = document.querySelector('.slider');
+const firstPageButton = document.querySelector('.first-page-btn');
+const header = document.querySelector('.header-a');
 let count = 0;
-let width;
+
+//slider-swiper
 
 function init() {
-    width = document.querySelector('.slider').offsetWidth;
     sliderLine.style.width = width * images.length + 'px';
     images.forEach(item => {
         item.style.width = width + 'px';
@@ -18,32 +21,40 @@ function init() {
 
 init();
 
-//Распознавание touch, сравнивание с расстоянием в какую сторону был свайп
+// Распознавание touch, сравнивание с расстоянием в какую сторону был свайп
+let startPos = null;
+
+
 function touchStart(evt) {
-    // console.log('touchstart')
-    let startEvt = evt
-    document.getElementById('slider').ontouchend = function (endEvt) {
-        let startPos = startEvt.changedTouches[0].clientX
-        let endPos = endEvt.changedTouches[0].clientX
-        if (startPos > endPos) {
-            if (count === 2) {
-                count = 0
-            } else {
-                count++
-            }
-
-        }
-        if (startPos < endPos) {
-            if (count > 0) {
-                count--
-            }
-
-        }
-        rollSlider(count)
-    }
+    startPos = evt.changedTouches[0].clientX
 }
 
-document.querySelector('.slider').addEventListener('touchstart', touchStart, true);
+
+function touchEnd(evt) {
+    let endPos = evt.changedTouches[0].clientX
+    // Где 45, это проверка на какое расстояние был перемещен свайп, более 45 - сделать свайп, менее 45 - тач
+    if (startPos > endPos && startPos-endPos > 45) {
+        if (count === 2) {
+            count = 0
+        } else {
+            count++
+        }
+    }
+    if (startPos < endPos && endPos-startPos > 45) {
+        if (count > 0) {
+            count--
+        }
+    }
+    rollSlider(count)
+
+}
+
+slider.addEventListener('touchstart',touchStart);
+slider.addEventListener('touchend',touchEnd)
+
+//
+//
+//
 
 //roll slider - перенос на следующий элемент страницы (1024px)
 function rollSlider(count) {
@@ -88,14 +99,11 @@ btnForward.onclick = function () {
     ellipse.style.display = "block";
 }
 
-// let firstPageBtn = document.getElementById("firstPageBtn")
-// let slider = document.querySelector('.slider-line')
-
-document.querySelector('.first-page-btn').addEventListener('click', function () {
+firstPageButton.addEventListener('click', function () {
     rollSlider(count=1);
 });
 
-document.querySelector('.header-a').addEventListener('click', function () {
+header.addEventListener('click', function () {
     rollSlider(count=0);
 });
 
@@ -103,8 +111,6 @@ let sliderR = document.getElementById('slider-body')
 let sliderBtn = document.getElementById('slider-btn')
 let bodyTextP = document.getElementById('body-text-p')
 let bodyText = document.getElementById('body-text')
-
-
 
 sliderR.addEventListener('touchmove', function (evt) {
     let btnHeight = sliderBtn.getBoundingClientRect().height
@@ -142,7 +148,7 @@ sliderR.addEventListener('touchmove', function (evt) {
 
     sliderBtn.style.top = `${sliderTouchPos - btnHeight/2}px`
     bodyTextP.style.top = `${-WPos}px`
-    console.log(-WPos)
+
 });
 
 
